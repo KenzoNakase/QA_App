@@ -91,27 +91,6 @@ public class QuestionDetailActivity extends AppCompatActivity {
         mListView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
 
-
-        // 要件1. ログインしている場合に質問詳細画面に「お気に入り」ボタンを表示
-        final Button button = (Button) findViewById(R.id.button);
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            button.setVisibility(View.GONE);
-        }
-
-        // 要件2. ログインしている場合に「お気に入り」が既にタップされているかどうかをボタンの見た目で判断できるようにする
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //リソースからボタンのリソースを取得
-                Button btn = (Button)findViewById(R.id.button);
-                //リソースから作成したDrawableのリソースを取得
-                Drawable btn_color = ResourcesCompat.getDrawable(getResources(), R.drawable.color_button, null);
-                //ボタンにDrawableを適用する
-                btn.setBackground(btn_color);
-            }
-        });
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,5 +116,33 @@ public class QuestionDetailActivity extends AppCompatActivity {
         DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
         mAnswerRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mQuestion.getGenre())).child(mQuestion.getQuestionUid()).child(Const.AnswersPATH);
         mAnswerRef.addChildEventListener(mEventListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // 要件1. ログインしている場合に質問詳細画面に「お気に入り」ボタンを表示
+        final Button button = (Button) findViewById(R.id.button);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            button.setVisibility(View.GONE);
+        } else {
+            button.setVisibility(View.VISIBLE);
+        }
+
+        // 要件2. ログインしている場合に「お気に入り」が既にタップされているかどうかをボタンの見た目で判断できるようにする
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //リソースからボタンのリソースを取得
+                Button btn = (Button)findViewById(R.id.button);
+                //リソースから作成したDrawableのリソースを取得
+                Drawable btn_color = ResourcesCompat.getDrawable(getResources(), R.drawable.color_button, null);
+                //ボタンにDrawableを適用する
+                btn.setBackground(btn_color);
+            }
+        });
+
     }
 }

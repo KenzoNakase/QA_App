@@ -1,10 +1,12 @@
 package jp.techacademy.kenzou.nakase.qa_app;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -14,7 +16,6 @@ import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.AdapterView;
 
@@ -40,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
     private ListView mListView;
     private ArrayList<Question> mQuestionArrayList;
     private QuestionsListAdapter mAdapter;
+
+    private NavigationView mNavigationView;
+
 
     private ChildEventListener mEventListener = new ChildEventListener() {
         @Override
@@ -158,23 +162,9 @@ public class MainActivity extends AppCompatActivity {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        //要件4. ログインしている場合にドロワーメニューに「お気に入り」一覧画面へ遷移するリンクを追加
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-            Menu menu = navigationView.getMenu();
-            MenuItem nav_favourite = menu.findItem(R.id.nav_favourite);
-            nav_favourite.setVisible(false);
-        } else {
-            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-            Menu menu = navigationView.getMenu();
-            MenuItem nav_favourite = menu.findItem(R.id.nav_favourite);
-            nav_favourite.setVisible(true);
-        }
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 int id = item.getItemId();
@@ -257,5 +247,25 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //要件4. ログインしている場合にドロワーメニューに「お気に入り」一覧画面へ遷移するリンクを追加
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Menu menu = mNavigationView.getMenu();
+            MenuItem nav_favourite = menu.findItem(R.id.nav_favourite);
+            nav_favourite.setVisible(false);
+        } else {
+            Menu menu = mNavigationView.getMenu();
+            MenuItem nav_favourite = menu.findItem(R.id.nav_favourite);
+            nav_favourite.setVisible(true);
+        }
+
+
+
     }
 }
