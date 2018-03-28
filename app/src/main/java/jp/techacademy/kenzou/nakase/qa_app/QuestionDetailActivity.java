@@ -1,14 +1,15 @@
 package jp.techacademy.kenzou.nakase.qa_app;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Button;
-import android.support.v4.content.res.ResourcesCompat;
-import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -18,7 +19,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
+import static jp.techacademy.kenzou.nakase.qa_app.MainActivity.array;
+
 
 public class QuestionDetailActivity extends AppCompatActivity {
 
@@ -27,6 +33,11 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private QuestionDetailListAdapter mAdapter;
 
     private DatabaseReference mAnswerRef;
+    private DatabaseReference mFavouriteRef;
+    private DatabaseReference mIsFavouriteRef;
+    private DatabaseReference mGenreRef;
+
+    boolean mIsFavourite = false;
 
     private ChildEventListener mEventListener = new ChildEventListener() {
         @Override
@@ -49,6 +60,38 @@ public class QuestionDetailActivity extends AppCompatActivity {
             Answer answer = new Answer(body, name, uid, answerUid);
             mQuestion.getAnswers().add(answer);
             mAdapter.notifyDataSetChanged();
+
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
+    private ChildEventListener mFavouriteListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            mIsFavourite = true;
+            Button btn =(Button) findViewById(R.id.button);
+            Drawable orange_btn = ResourcesCompat.getDrawable(getResources(),R.drawable.orange_button, null);
+            btn.setBackground(orange_btn);
+
 
         }
 
@@ -129,20 +172,50 @@ public class QuestionDetailActivity extends AppCompatActivity {
             button.setVisibility(View.GONE);
         } else {
             button.setVisibility(View.VISIBLE);
+            DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
+            mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(mQuestion.getUid()).child(mQuestion.getQuestionUid());
+            mFavouriteRef.addChildEventListener(mFavouriteListener);
         }
 
-        // 要件2. ログインしている場合に「お気に入り」が既にタップされているかどうかをボタンの見た目で判断できるようにする
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //リソースからボタンのリソースを取得
-                Button btn = (Button)findViewById(R.id.button);
-                //リソースから作成したDrawableのリソースを取得
-                Drawable btn_color = ResourcesCompat.getDrawable(getResources(), R.drawable.color_button, null);
-                //ボタンにDrawableを適用する
-                btn.setBackground(btn_color);
+
+                mIsFavourite = !mIsFavourite;
+
+                DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
+                mIsFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(mQuestion.getUid());
+
+                if (mIsFavourite) {
+
+                    Map<String, String> data = new HashMap<String, String>();
+
+                    mGenreRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mQuestion.getGenre()));
+                    String genre = mGenreRef.getKey();
+                    data.put("genre", genre);
+                    mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(mQuestion.getUid()).child(mQuestion.getQuestionUid());
+                    mFavouriteRef.setValue(data);
+                    array.add(mIsFavouriteRef.getKey());
+
+                } else {
+
+                    mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(mQuestion.getUid()).child(mQuestion.getQuestionUid());
+                    mFavouriteRef.removeValue();
+                    array.remove(mIsFavouriteRef.getKey());
+                }
+
+                if(array.contains(mIsFavouriteRef.getKey())) {
+                    Button btn =(Button) findViewById(R.id.button);
+                    Drawable orange_btn = ResourcesCompat.getDrawable(getResources(),R.drawable.orange_button, null);
+                    btn.setBackground(orange_btn);
+
+                }
+
             }
+
         });
 
     }
+
 }

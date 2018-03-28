@@ -13,9 +13,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.AdapterView;
 
@@ -29,6 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     private QuestionsListAdapter mAdapter;
 
     private NavigationView mNavigationView;
+
+    public static ArrayList<String> array = new ArrayList<String>();
 
 
     private ChildEventListener mEventListener = new ChildEventListener() {
@@ -77,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
             Question question = new Question(title, body, name, uid, dataSnapshot.getKey(), mGenre, bytes, answerArrayList);
             mQuestionArrayList.add(question);
             mAdapter.notifyDataSetChanged();
+
         }
 
         @Override
@@ -103,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
                     mAdapter.notifyDataSetChanged();
                 }
             }
+
         }
 
         @Override
@@ -182,8 +189,8 @@ public class MainActivity extends AppCompatActivity {
                     mToolbar.setTitle("コンピューター");
                     mGenre = 4;
                 } else if (id == R.id.nav_favourite) {
-                    mToolbar.setTitle("お気に入り");
-
+                    Intent intent = new Intent(getApplicationContext(), FavouritesList.class);
+                    startActivity(intent);
                 }
 
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -199,12 +206,11 @@ public class MainActivity extends AppCompatActivity {
                     mGenreRef.removeEventListener(mEventListener);
                 }
 
-                mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
-
                 mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
+
+                Log.d("ANDROID_USER", String.valueOf(mGenreRef));
                 mGenreRef.addChildEventListener(mEventListener);
                 return true;
-
             }
         });
 
@@ -264,8 +270,8 @@ public class MainActivity extends AppCompatActivity {
             MenuItem nav_favourite = menu.findItem(R.id.nav_favourite);
             nav_favourite.setVisible(true);
         }
-
-
-
     }
+
+
+
 }

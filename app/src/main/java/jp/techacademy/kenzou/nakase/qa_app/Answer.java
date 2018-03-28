@@ -10,6 +10,7 @@ public class Answer implements Serializable {
 
     public Answer(String body, String name, String uid, String answerUid) {
         mBody = body;
+
         mName = name;
         mUid = uid;
         mAnswerUid = answerUid;
