@@ -31,10 +31,9 @@ public class FavouritesList extends AppCompatActivity {
 
     private DatabaseReference mDatabaseReference;
     private DatabaseReference mIsFavouriteRef;
-    private DatabaseReference mFavouriteQuestionUID;
     private DatabaseReference mFavouriteRef;
     private DatabaseReference mFavouriteGenre;
-    private DatabaseReference mQuestionUid;
+    private int mQuestionUid;
 
     private DatabaseReference mGenreRef;
 
@@ -100,6 +99,7 @@ public class FavouritesList extends AppCompatActivity {
         }
     };
 
+    //お気に入りにしたQuestionUidのみ表示させるListener
     private ChildEventListener mFavouriteListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -129,8 +129,6 @@ public class FavouritesList extends AppCompatActivity {
         }
     };
 
-    //EventListnerをもうひとつ作る
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -144,7 +142,6 @@ public class FavouritesList extends AppCompatActivity {
         // Firebase
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
-                // ListViewの準備
         // ListViewの準備
         mListView = (ListView) findViewById(R.id.listView);
         mAdapter = new FavouritesListAdapter(this);
@@ -167,6 +164,7 @@ public class FavouritesList extends AppCompatActivity {
             mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
             mGenreRef.addChildEventListener(mEventListener);
         }
+
     }
 
     @Override

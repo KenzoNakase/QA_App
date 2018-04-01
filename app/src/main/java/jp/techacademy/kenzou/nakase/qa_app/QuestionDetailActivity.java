@@ -203,17 +203,11 @@ public class QuestionDetailActivity extends AppCompatActivity {
                     mFavouriteGenreRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid()).child(mQuestion.getQuestionUid()).child(String.valueOf(mQuestion.getGenre()));
                     mFavouriteRef.setValue(data);
                     map.put(mFavouriteRef.getKey(), mFavouriteGenreRef.getKey());
-                    for (String key : map.keySet()) {
-                        Log.d("javatest", map.get(key));
-                    }
 
                 } else {
                     mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid()).child(mQuestion.getQuestionUid());
                     mFavouriteRef.removeValue();
                     map.remove(mFavouriteRef.getKey());
-                    for (String key : map.keySet()) {
-                        Log.d("javatest", map.get(key));
-                    }
                 }
 
                 if(map.containsKey(mFavouriteRef.getKey())) {
