@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static jp.techacademy.kenzou.nakase.qa_app.MainActivity.array;
+import static jp.techacademy.kenzou.nakase.qa_app.MainActivity.map;
 
 
 public class QuestionDetailActivity extends AppCompatActivity {
@@ -34,6 +34,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
 
     private DatabaseReference mAnswerRef;
     private DatabaseReference mFavouriteRef;
+    private DatabaseReference mFavouriteGenreRef;
     private DatabaseReference mIsFavouriteRef;
     private DatabaseReference mGenreRef;
 
@@ -91,8 +92,6 @@ public class QuestionDetailActivity extends AppCompatActivity {
             Button btn =(Button) findViewById(R.id.button);
             Drawable orange_btn = ResourcesCompat.getDrawable(getResources(),R.drawable.orange_button, null);
             btn.setBackground(orange_btn);
-
-
         }
 
         @Override
@@ -121,6 +120,10 @@ public class QuestionDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_question_detail);
+
+        Button btn =(Button) findViewById(R.id.button);
+        Drawable default_btn = ResourcesCompat.getDrawable(getResources(),R.drawable.default_button, null);
+        btn.setBackground(default_btn);
 
         // 渡ってきたQuestionのオブジェクトを保持する
         Bundle extras = getIntent().getExtras();
@@ -173,7 +176,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
         } else {
             button.setVisibility(View.VISIBLE);
             DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
-            mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(mQuestion.getUid()).child(mQuestion.getQuestionUid());
+            mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid()).child(mQuestion.getQuestionUid());
             mFavouriteRef.addChildEventListener(mFavouriteListener);
         }
 
@@ -183,6 +186,8 @@ public class QuestionDetailActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 mIsFavourite = !mIsFavourite;
+
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
                 DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
                 mIsFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(mQuestion.getUid());
@@ -194,22 +199,31 @@ public class QuestionDetailActivity extends AppCompatActivity {
                     mGenreRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mQuestion.getGenre()));
                     String genre = mGenreRef.getKey();
                     data.put("genre", genre);
-                    mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(mQuestion.getUid()).child(mQuestion.getQuestionUid());
+                    mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid()).child(mQuestion.getQuestionUid());
+                    mFavouriteGenreRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid()).child(mQuestion.getQuestionUid()).child(String.valueOf(mQuestion.getGenre()));
                     mFavouriteRef.setValue(data);
-                    array.add(mIsFavouriteRef.getKey());
+                    map.put(mFavouriteRef.getKey(), mFavouriteGenreRef.getKey());
+                    for (String key : map.keySet()) {
+                        Log.d("javatest", map.get(key));
+                    }
 
                 } else {
-
-                    mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(mQuestion.getUid()).child(mQuestion.getQuestionUid());
+                    mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid()).child(mQuestion.getQuestionUid());
                     mFavouriteRef.removeValue();
-                    array.remove(mIsFavouriteRef.getKey());
+                    map.remove(mFavouriteRef.getKey());
+                    for (String key : map.keySet()) {
+                        Log.d("javatest", map.get(key));
+                    }
                 }
 
-                if(array.contains(mIsFavouriteRef.getKey())) {
+                if(map.containsKey(mFavouriteRef.getKey())) {
                     Button btn =(Button) findViewById(R.id.button);
                     Drawable orange_btn = ResourcesCompat.getDrawable(getResources(),R.drawable.orange_button, null);
                     btn.setBackground(orange_btn);
-
+                } else {
+                    Button btn =(Button) findViewById(R.id.button);
+                    Drawable default_btn = ResourcesCompat.getDrawable(getResources(),R.drawable.default_button, null);
+                    btn.setBackground(default_btn);
                 }
 
             }

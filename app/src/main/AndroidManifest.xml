@@ -26,7 +26,10 @@
         <activity android:name=".QuestionSendActivity" />
         <activity android:name=".QuestionDetailActivity" />
         <activity android:name=".AnswerSendActivity" />
-        <activity android:name=".FavouritesList"></activity>
+        <activity
+            android:name=".FavouritesList"
+            android:label="お気に入り">
+        </activity>
     </application>
 
 </manifest>

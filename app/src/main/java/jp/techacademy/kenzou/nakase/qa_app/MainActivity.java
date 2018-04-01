@@ -17,7 +17,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.AdapterView;
 
@@ -47,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     private NavigationView mNavigationView;
 
-    public static ArrayList<String> array = new ArrayList<String>();
+    public static HashMap<String,String> map = new HashMap<String,String>();
 
 
     private ChildEventListener mEventListener = new ChildEventListener() {
@@ -135,6 +134,8 @@ public class MainActivity extends AppCompatActivity {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
+        //Log.d("javatest", String.valueOf(map.get(mFavouriteRef.getKey()));
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -207,8 +208,6 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
-
-                Log.d("ANDROID_USER", String.valueOf(mGenreRef));
                 mGenreRef.addChildEventListener(mEventListener);
                 return true;
             }
