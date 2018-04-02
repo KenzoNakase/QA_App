@@ -159,11 +159,22 @@ public class FavouritesList extends AppCompatActivity {
         }
 
         //お気に入りボタンを押したQuestionUidのgenreのみ表示させる
-        for (String key : map.keySet()) {
-            mGenre = Integer.parseInt(map.get(key));
-            mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
-            mGenreRef.addChildEventListener(mEventListener);
-        }
+        //for (String key : map.keySet()) {
+        //    mGenre = Integer.parseInt(map.get(key));
+        //    mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
+        //    mGenreRef.addChildEventListener(mEventListener);
+        //}
+
+        //for (String key : map.keySet()) {
+        //    Log.d("javatest", key);
+        //    if (mFavouriteRef.getKey().equals(key)) {
+        //
+        //    }
+        //}
+
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        mDatabaseReference.child(Const.FavouritesPATH).child(user.getUid()).addChildEventListener(mEventListener);
 
     }
 

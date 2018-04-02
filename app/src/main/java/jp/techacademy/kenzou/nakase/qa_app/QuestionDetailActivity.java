@@ -7,9 +7,13 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Button;
-import android.util.Log;
+import android.util.Base64;
+import java.io.ByteArrayOutputStream;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -19,7 +23,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +40,15 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private DatabaseReference mFavouriteRef;
     private DatabaseReference mFavouriteGenreRef;
     private DatabaseReference mIsFavouriteRef;
-    private DatabaseReference mGenreRef;
+    private DatabaseReference mBodyRef;
+    private DatabaseReference mImageRef;
+    private DatabaseReference mNameRef;
+    private DatabaseReference mTitleRef;
+    private DatabaseReference mUidRef;
+
+    private ImageView mImageView;
+
+
 
     boolean mIsFavourite = false;
 
@@ -179,8 +191,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
             mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid()).child(mQuestion.getQuestionUid());
             mFavouriteRef.addChildEventListener(mFavouriteListener);
         }
-
-
+        
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -196,9 +207,34 @@ public class QuestionDetailActivity extends AppCompatActivity {
 
                     Map<String, String> data = new HashMap<String, String>();
 
-                    mGenreRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mQuestion.getGenre()));
-                    String genre = mGenreRef.getKey();
-                    data.put("genre", genre);
+                    mBodyRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mQuestion.getBody()));
+
+                    mImageView = (ImageView) findViewById(R.id.imageView);
+
+                    // 添付画像を取得する
+                    BitmapDrawable drawable = (BitmapDrawable) mImageView.getDrawable();
+
+                    // 添付画像が設定されていれば画像を取り出してBASE64エンコードする
+                    if (drawable != null) {
+                        Bitmap bitmap = drawable.getBitmap();
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+                        String bitmapString = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+
+                        data.put("image", bitmapString);
+                    }
+
+                    mNameRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mQuestion.getName()));
+                    mTitleRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mQuestion.getTitle()));
+                    mUidRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mQuestion.getUid()));
+                    String body = mBodyRef.getKey();
+                    String name = mNameRef.getKey();
+                    String title = mTitleRef.getKey();
+                    String uid = mUidRef.getKey();
+                    data.put("body", body);
+                    data.put("name", name);
+                    data.put("title", title);
+                    data.put("uid", uid);
                     mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid()).child(mQuestion.getQuestionUid());
                     mFavouriteGenreRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid()).child(mQuestion.getQuestionUid()).child(String.valueOf(mQuestion.getGenre()));
                     mFavouriteRef.setValue(data);
