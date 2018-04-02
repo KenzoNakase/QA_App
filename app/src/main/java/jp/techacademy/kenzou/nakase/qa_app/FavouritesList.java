@@ -8,11 +8,9 @@ import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,16 +25,8 @@ import static jp.techacademy.kenzou.nakase.qa_app.MainActivity.map;
 public class FavouritesList extends AppCompatActivity {
 
     private int mGenre = 0;
-    private Question mQuestion;
-
     private DatabaseReference mDatabaseReference;
-    private DatabaseReference mIsFavouriteRef;
-    private DatabaseReference mFavouriteRef;
-    private DatabaseReference mFavouriteGenre;
-    private int mQuestionUid;
-
     private DatabaseReference mGenreRef;
-
     private ListView mListView;
     private ArrayList<Question> mQuestionArrayList;
     private FavouritesListAdapter mAdapter;
@@ -157,21 +147,6 @@ public class FavouritesList extends AppCompatActivity {
         if (mGenreRef != null) {
             mGenreRef.removeEventListener(mEventListener);
         }
-
-        //お気に入りボタンを押したQuestionUidのgenreのみ表示させる
-        //for (String key : map.keySet()) {
-        //    mGenre = Integer.parseInt(map.get(key));
-        //    mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
-        //    mGenreRef.addChildEventListener(mEventListener);
-        //}
-
-        //for (String key : map.keySet()) {
-        //    Log.d("javatest", key);
-        //    if (mFavouriteRef.getKey().equals(key)) {
-        //
-        //    }
-        //}
-
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         mDatabaseReference.child(Const.FavouritesPATH).child(user.getUid()).addChildEventListener(mEventListener);

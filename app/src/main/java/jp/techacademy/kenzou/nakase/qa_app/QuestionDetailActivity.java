@@ -23,7 +23,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,14 +40,11 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private DatabaseReference mFavouriteGenreRef;
     private DatabaseReference mIsFavouriteRef;
     private DatabaseReference mBodyRef;
-    private DatabaseReference mImageRef;
     private DatabaseReference mNameRef;
     private DatabaseReference mTitleRef;
     private DatabaseReference mUidRef;
 
     private ImageView mImageView;
-
-
 
     boolean mIsFavourite = false;
 
@@ -191,7 +187,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
             mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid()).child(mQuestion.getQuestionUid());
             mFavouriteRef.addChildEventListener(mFavouriteListener);
         }
-        
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
