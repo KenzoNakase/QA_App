@@ -1,12 +1,19 @@
 package jp.techacademy.kenzou.nakase.qa_app;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.StyleRes;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Button;
@@ -23,19 +30,25 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import android.util.Log;
 
 import static jp.techacademy.kenzou.nakase.qa_app.MainActivity.map;
 
 
 public class QuestionDetailActivity extends AppCompatActivity {
 
-    private ListView mListView;
+
     private Question mQuestion;
     private QuestionDetailListAdapter mAdapter;
 
+    private ListView mListView;
+
     private DatabaseReference mAnswerRef;
+    private DatabaseReference mFavouriteAnswerRef;
+    private DatabaseReference mAnswerArrayListRef;
     private DatabaseReference mFavouriteRef;
     private DatabaseReference mFavouriteGenreRef;
     private DatabaseReference mIsFavouriteRef;
@@ -43,8 +56,22 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private DatabaseReference mNameRef;
     private DatabaseReference mTitleRef;
     private DatabaseReference mUidRef;
+    private DatabaseReference mAnswerBody;
+    private DatabaseReference mAnswerName;
+    private DatabaseReference mAnswerUid;
+
+    @Override
+    protected void onApplyThemeResource(Resources.Theme theme, @StyleRes int resid, boolean first) {
+        super.onApplyThemeResource(theme, resid, first);
+    }
+
+    @Override
+    public PackageManager getPackageManager() {
+        return super.getPackageManager();
+    }
 
     private ImageView mImageView;
+    private EditText mAnswerEditText;
 
     boolean mIsFavourite = false;
 
@@ -93,7 +120,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
         }
     };
 
-    private ChildEventListener mFavouriteListener = new ChildEventListener() {
+    private ChildEventListener mIsFavouriteListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             mIsFavourite = true;
@@ -122,6 +149,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
 
         }
     };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,7 +213,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
             button.setVisibility(View.VISIBLE);
             DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
             mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid()).child(mQuestion.getQuestionUid());
-            mFavouriteRef.addChildEventListener(mFavouriteListener);
+            mFavouriteRef.addChildEventListener(mIsFavouriteListener);
         }
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -223,17 +251,41 @@ public class QuestionDetailActivity extends AppCompatActivity {
                     mNameRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mQuestion.getName()));
                     mTitleRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mQuestion.getTitle()));
                     mUidRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mQuestion.getUid()));
+
                     String body = mBodyRef.getKey();
                     String name = mNameRef.getKey();
                     String title = mTitleRef.getKey();
                     String uid = mUidRef.getKey();
+
                     data.put("body", body);
                     data.put("name", name);
                     data.put("title", title);
                     data.put("uid", uid);
+
                     mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid()).child(mQuestion.getQuestionUid());
-                    mFavouriteGenreRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid()).child(mQuestion.getQuestionUid()).child(String.valueOf(mQuestion.getGenre()));
                     mFavouriteRef.setValue(data);
+
+
+                    Map<String, String> data2 = new HashMap<String, String>();
+
+                    ArrayList<Answer> answer = mQuestion.getAnswers();
+
+                    /*
+
+                    String answerBody = (String) answer.get("body");
+                    String answerName = (String) answer.get("name");
+                    String answerUid = (String) answer.get("uid");
+                    
+                    data2.put("body", answerBody);
+                    data2.put("name", answerName);
+                    data2.put("uid", answerUid);
+
+                    */
+
+                    mFavouriteAnswerRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid()).child(mQuestion.getQuestionUid()).child(Const.AnswersPATH);
+                    mFavouriteAnswerRef.setValue(data2);
+
+                    mFavouriteGenreRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid()).child(mQuestion.getQuestionUid()).child(String.valueOf(mQuestion.getGenre()));
                     map.put(mFavouriteRef.getKey(), mFavouriteGenreRef.getKey());
 
                 } else {
