@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private int mGenre = 0;
 
     private DatabaseReference mDatabaseReference;
+    private DatabaseReference mFavouriteRef;
     private DatabaseReference mGenreRef;
 
     private ListView mListView;
@@ -104,6 +105,38 @@ public class MainActivity extends AppCompatActivity {
                     mAdapter.notifyDataSetChanged();
                 }
             }
+
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
+    private ChildEventListener mFavouriteListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            HashMap map = (HashMap) dataSnapshot.getValue();
+            String genre = (String) map.get("genre");
+
+            map.put(dataSnapshot.getKey(), genre);
+
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
 
         }
 
@@ -254,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
+            map.clear();
             Menu menu = mNavigationView.getMenu();
             MenuItem nav_favourite = menu.findItem(R.id.nav_favourite);
             nav_favourite.setVisible(false);
@@ -261,6 +295,9 @@ public class MainActivity extends AppCompatActivity {
             Menu menu = mNavigationView.getMenu();
             MenuItem nav_favourite = menu.findItem(R.id.nav_favourite);
             nav_favourite.setVisible(true);
+            DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
+            mFavouriteRef = dataBaseReference.child(Const.FavouritesPATH).child(user.getUid());
+            mFavouriteRef.addChildEventListener(mFavouriteListener);
         }
     }
 
